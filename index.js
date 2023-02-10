@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const fs = require("fs");
 
 // Import of the model Recipe from './models/Recipe.model.js'
 const Recipe = require('./models/Recipe.model');
@@ -16,8 +17,41 @@ mongoose
     return Recipe.deleteMany()
   })
   .then(() => {
-    // Run your code here, after you have insured that the connection was made
+    return Recipe.create({
+      "title": "Corn Flakes and Milk",
+      "level": "Easy Peasy",
+      "ingredients": [
+        "1 cup Corn Flakes",
+        "1/2 cup 2% milk",
+      ],
+      "cuisine": "American",
+      "dishType": "breakfast",
+      "image": "",
+      "duration": 1,
+      "creator": "Chef Aipamferchillais"
+    })
+  })
+  .then(() => {
+      return Recipe.insertMany(data)
+  })
+  .then(async () =>  {
+    const rigatoni = await Recipe.findOneAndUpdate(
+      {title: "Rigatoni alla Genovese"},
+      {duration: 100},
+      {new: true}
+      )
+      console.log(`${rigatoni.title} recipe is now ${rigatoni.duration}mn long, as it should be.`)
+  })
+  .then(async () => {
+    const missionReport = await Recipe.deleteOne({title: "Carrot Cake"})
+    if (missionReport.deletedCount === 1) {
+      console.log("Carrot Cake is down! Over.")
+    }
   })
   .catch(error => {
     console.error('Error connecting to the database', error);
+  })
+  .finally(() => {
+    console.log("closing connection")
+    mongoose.connection.close()
   });
